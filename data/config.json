@@ -1,0 +1,13 @@
+{
+  "api_keys": {
+    "weather_api_key": "91201722ff1cc4a99e9c870bbbe2aafb",
+    "geocoding_api_key": "9d3e125d43feb5f93c8927b1a58e6fb7"
+  },
+
+  "sampling_rate_in_min": 5,
+  "up_to_date_in_sec": 60,
+  "urls": {
+    "weather": "http://api.positionstack.com/v1/forward"
+  }
+
+}
