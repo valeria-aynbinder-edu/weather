@@ -1,35 +1,46 @@
-import datetime
-import time
 import threading
+import time
+
+
+# Question: is synchronization needed?
+from mngrs.cache_mngr import CacheMngr
+from mngrs.config_mngr import ConfigMngr
+from mngrs.subscription_mngr import SubscriptionMngr
 
 
 class Sampler:
 
     def __init__(self):
-        self.subscription_mngr = None
-        self.cache_mngr = None
-        self.config_mngr = None
+        self.subscription_mngr = SubscriptionMngr.get_instance()
+        self.cache_mngr = CacheMngr.get_instance()
+        self.config_mngr = ConfigMngr.factory()
+        self.listeners = []
 
         self.interrupt = False
-        # self.last_update = None
+        self.timer = None
 
-    def interrupt(self):
+    def stop_execution(self):
         self.interrupt = True
+        if self.timer:
+            self.timer.cancel()
 
-    def _run_once(self):
-        print("Inside run_once")
-        if not self.interrupt():
-            timer = threading.Timer(5, self._run_once)
-            timer.start()
+    def run(self):
+        if not self.interrupt:
+
+            for city, users_set in self.subscription_mngr.get_subscriptions().items():
+                weather = self.cache_mngr.get_weather(city)
+                for user in users_set:
+                    #todo: save data in files
+                    print(f"\nSampler: Stored weather data for {city} for user {user}")
+
+            # set a new timer
+            self.timer = threading.Timer(self.config_mngr.config['sampling_rate_in_sec'], self.run)
+            self.timer.start()
+        else:
+            print("ending sampling")
         # check all the subscriptions and call get_weather where needed
 
-    # def start(self):
-    #
-    #     timer = threading.Timer(5, self._run_once)
-    #     timer.start()
-        # while True:
-        #     time.sleep(300)
-        #     # if (datetime.datetime.now() - self.last_update).total_seconds >= 300:
-        #     self._run_once()
-        #     self.last_update = datetime.datetime.now()
+    #todo - implement adding notifiers or other listeners
+    def add_listener(self):
+        pass
 

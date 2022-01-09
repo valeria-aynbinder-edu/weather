@@ -1,17 +1,18 @@
-from mngrs.cache_mngr import CacheMngr
-import threading
+from menu.main_menu import MainMenu
+from workers.sampler import Sampler
 
 if __name__ == "__main__":
 
+    # New thread for main menu
+    main_menu_thread = MainMenu()
+    main_menu_thread.start()
 
+    # Init Sampler (will run using timers)
+    sampler = Sampler()
+    sampler.run()
 
-    # main thread - runs menu
-    while True:
-        print("Main menu\n1 - get current weather data\n2 - subscribe for weather data")
-        # add here code to get input from the user
-        # if user selected 1
-        city = "London"
-        print(CacheMngr.get_instance().get_weather(city))
-
-        # option 2
-        # enter cities (up to 5)
+    # Wait for the app to finish - when user selects "Exit"
+    main_menu_thread.join()
+    # if we got here - user asked to exit. Let's finalize everything and exit
+    # notify other threads to exit
+    sampler.stop_execution()

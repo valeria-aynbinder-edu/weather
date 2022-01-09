@@ -1,6 +1,7 @@
 import json
 import os
 
+
 class ConfigMngr:
 
     def __init__(self, file_path):

@@ -4,10 +4,11 @@
     "geocoding_api_key": "9d3e125d43feb5f93c8927b1a58e6fb7"
   },
 
-  "sampling_rate_in_min": 5,
+  "sampling_rate_in_sec": 5,
   "up_to_date_in_sec": 1,
   "urls": {
-    "weather": "http://api.positionstack.com/v1/forward"
+    "geocoding": "http://api.positionstack.com/v1/forward",
+    "weather": "https://api.openweathermap.org/data/2.5/weather"
   }
 
 }

@@ -1,7 +1,9 @@
 import threading
 import datetime
+import requests
 
 from mngrs.config_mngr import ConfigMngr
+from model.weather_data import WeatherData
 
 """
 This class should be thread-safe, and singletone
@@ -35,7 +37,20 @@ class CacheMngr:
         :return:
 
         """
-        print("inside get_weather")
         with self.cache_lock:
-            if city in self.cache and (datetime.datetime.utcnow() - self.cache[city]["ts"]).total_seconds() > self.config_mngr.interval:
-                pass
+            if city not in self.cache or (datetime.datetime.utcnow() - self.cache[city]["ts"]).total_seconds() > self.config_mngr.interval:
+                weather_data = self.get_weather_from_api(city)
+                self.cache[city] = {'data': weather_data, 'ts': datetime.datetime.utcnow()}
+            return self.cache[city]['data']
+
+    def get_weather_from_api(self, city):
+        print(f"\nDebug: Sending request for {city}")
+        response = requests.get(
+            self.config_mngr.config['urls']['weather'],
+            params={
+                "q": city,
+                "appid": self.config_mngr.config['api_keys']['weather_api_key'],
+                "units": "metric"
+            })
+        if response.status_code == 200:
+            return WeatherData(response.json())
